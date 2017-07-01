@@ -1,27 +1,13 @@
 import React from 'react';
 // import PropTypes from 'prop-types';
-import {
-  BrowserRouter,
-  Route,
-  Link,
-} from 'react-router-dom';
 
-import Home from './containers/Home';
-import About from './containers/About';
+import GameBoard from './containers/GameBoard';
 
 const App = () => (
-  <BrowserRouter>
-    <main>
-      <h1>hello world!</h1>
-      <ul>
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/about">About</Link></li>
-      </ul>
-
-      <Route exact path="/" component={Home} />
-      <Route path="/about" component={About} />
-    </main>
-  </BrowserRouter>
+  <main>
+    <h1>Game of Life</h1>
+    <GameBoard />
+  </main>
     );
 
 export default App;
