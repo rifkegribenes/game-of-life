@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import {
   BrowserRouter,
   Route,
@@ -9,23 +9,19 @@ import {
 import Home from './containers/Home';
 import About from './containers/About';
 
-class App extends React.Component {
-  render() {
-    return (
-      <BrowserRouter>
-        <main>
-          <h1>hello world!</h1>
-          <ul>
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/about">About</Link></li>
-          </ul>
+const App = () => (
+  <BrowserRouter>
+    <main>
+      <h1>hello world!</h1>
+      <ul>
+        <li><Link to="/">Home</Link></li>
+        <li><Link to="/about">About</Link></li>
+      </ul>
 
-          <Route exact path="/" component={Home} />
-          <Route path="/about" component={About} />
-        </main>
-      </BrowserRouter>
+      <Route exact path="/" component={Home} />
+      <Route path="/about" component={About} />
+    </main>
+  </BrowserRouter>
     );
-  }
-}
 
 export default App;

@@ -5,13 +5,11 @@ import { AppContainer } from 'react-hot-loader';
 import App from './App';
 import './style.scss';
 
-const root = document.getElementById('root');
-
 render(
   <AppContainer>
     <App />
   </AppContainer>,
-  root,
+  document.getElementById('root'),
 );
 
 if (module.hot) module.hot.accept(App, () => render(App));
