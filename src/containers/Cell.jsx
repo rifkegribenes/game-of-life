@@ -1,9 +1,9 @@
 import React from 'react';
 
-const GameBoard = () => (
+const Cell = () => (
   <div>
     <h2>GameBoard</h2>
   </div>
 );
 
-export default GameBoard;
+export default Cell;
