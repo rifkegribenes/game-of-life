@@ -1,132 +1,60 @@
-import React from 'react';
+import React, { Component } from 'react';
 
-const Board = () => (
-  <div>
-    <h2>GameBoard</h2>
-  </div>
-);
-
-/*
-@@@@@@@@@@@@@@@@@@@@@
-components:
-	board
-	cell
-	game
-	controls
-	canvass
-
-
-
-
-
-@@@@@@@@@@@@@@@@@@@@@@@
-seed patterns:
-	acorn
-	glider
-	gliderGun
-	line
-	still
-	switchEngine
-	pufferTrain
-	heart
-
-
-@@@@@@@@@@@@@@@@@@@@@@@
-board state:
-	width
-	height
-	array of cells
-	generation
-	running?
-	speed
-	changelist (each time only need to check cells that changed in last tick)
-	staticlist (when board is all static then stop generations)
-
-	use requestAnimationFrame :
-		update: function() {
-      this.step();
-      this.intervalID = requestAnimationFrame(this.update);
-    },
-
-    handleToggle: function() {
-      if (this.state.running) {
-        this.setState({running:false});
-        cancelAnimationFrame(this.intervalID);
-      } else {
-        this.setState({running:true});
-        this.intervalID = requestAnimationFrame(this.update);
-      }
-    },
-  });
-@@@@@@@@@@@@@@@@@@@@@@@@@
-board methods:
-	set size?
-	startGame/resumeGame
-	pauseGame
-	step
-	loadSeedPattern
-	handleClick
-	clearBoard
-	drawCells
-
-	toggle gridlines?
-	findNeighbors
-		isWithinGrid: function (row, col) {
-		return row >= 0 && row < this.state.size && col >= 0 && col < this.state.size;
-	},
-
-	getNeighbors: function (row, col) {
-		var cell = this.state.grid[row][col];
-		cell.neighbors = 0;
-		for (var i = 0; i < this.state.neighborCells.length; i++) {
-			var position = this.state.neighborCells[i];
-			var r = position[0];
-			var c = position[1];
-			if (this.isWithinGrid(row + r, col + c)) {
-				var neighbor = this.state.grid[row + r][col + c];
-				if (neighbor.isAlive) cell.neighbors++;
-			}
-		}
-	},
-	checkRules
-	generateRandomBoard
-		var game = new Array(data.rows * data.cols).fill(0).map(cell => {
-  if (Math.floor(Math.random() * data.randomLive) == 0) {
-    cell = 1
+class Board extends Component {
+  constructor() {
+    super();
+    this.state = {
+      width: 72,
+      height: 54,
+      cells: [],
+      generation: 0,
+      running: false,
+      changed: [],
+      static: [],
+    };
   }
-  return cell
-})
 
-var randomBoard = this.state.game.map(cell => Math.floor(Math.random() * this.state.randomLive) == 0 ? 1 : 0)
+  componentDidMount() {
+    this.randomBoard();
+  }
 
-data.game = game
+  randomBoard() {
+    const cells = new Array(this.state.height * this.state.width).fill(0).map(cell => Math.random() >= 0.5 ? 1 : 0);
+    console.log(cells);
+    this.setState((prevState, props) => ({ cells }), () => {
+      this.drawCells();
+    });
+  }
+
+  drawCell(x, y, bool) {
+    if (bool) {
+      const canvas = document.getElementById('board');
+      const ctx = canvas.getContext('2d');
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(x + 2, y + 2, 6, 6);
+      ctx.fillStyle = 'black';
+      ctx.fillRect(x + 2, y + 2, 6, 6);
+    }
+  }
+
+  drawCells() {
+    this.state.cells.forEach((cell, idx) => {
+      const x = 10 * (idx % this.state.width);
+      const y = 10 * (Math.floor(idx / this.state.width));
+      const bool = this.state.cells[idx];
+      this.drawCell(x, y, bool);
+    });
+  }
 
 
+  render() {
+    return (
+      <div />
+    );
+  }
 
-@@@@@@@@@@@@@@@@@@@
 
-cell state:
-	alive
-	age (=> color/opacity?)
-	visited
-	mouseDown
-
-if(arr[i] == 1) {
-    ctx.fillStyle = '#ff0000'
-} else {
-    fillStyle = '#000000'
-}
-
-@@@@@@@@@@@@@@@@@@@@@
-
-cell methods:
-	handle mouseOver (?)
-	handleClick
-	onClick: function () {
-		Actions.updateCellStatus(this.props.row, this.props.col);
-		this.setState({ isAlive: !this.state.isAlive });
-	},
-
-*/
+	}
 
 export default Board;

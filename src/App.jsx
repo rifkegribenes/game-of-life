@@ -1,12 +1,13 @@
 import React from 'react';
 // import PropTypes from 'prop-types';
 
-import GameBoard from './containers/GameBoard';
+import Board from './containers/Board';
 
 const App = () => (
   <main>
     <h1>Game of Life</h1>
-    <GameBoard />
+    <canvas id="board" width="720" height="540" />
+    <Board />
   </main>
     );
 
