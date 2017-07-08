@@ -22,9 +22,9 @@ seed patterns:
 
 @@@@@@@@@@@@@@@@@@@@@@@
 board state:
-	width
-	height
-	array of cells
+	// width
+	// height
+	// array of cells
 	generation
 	running?
 	speed
@@ -79,12 +79,6 @@ board methods:
 	},
 	checkRules
 	generateRandomBoard
-		var game = new Array(data.rows * data.cols).fill(0).map(cell => {
-  if (Math.floor(Math.random() * data.randomLive) == 0) {
-    cell = 1
-  }
-  return cell
-})
 
 var randomBoard = this.state.game.map(cell => Math.floor(Math.random() * this.state.randomLive) == 0 ? 1 : 0)
 
