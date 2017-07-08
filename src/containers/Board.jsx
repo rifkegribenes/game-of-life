@@ -6,27 +6,30 @@ class Board extends Component {
     this.state = {
       width: 72,
       height: 54,
-      cellSize: 12,
+      cellSize: 10,
       cells: [],
       nextCells: [],
       generation: 0,
-      running: false,
+      running: true,
+      paused: false,
       changed: [],
-      cellsToUpdate: [],
       static: [],
+      grid: false,
+      trails: true,
     };
 
-    this.newBoard = this.newBoard.bind(this);
+    this.step = this.step.bind(this);
+    this.play = this.play.bind(this);
+    this.pause = this.pause.bind(this);
+    this.reset = this.reset.bind(this);
+    this.toggleGrid = this.toggleGrid.bind(this);
+    // this.toggleTrails = this.toggleTrails.bind(this);
   }
 
   componentDidMount() {
     this.randomBoard();
     this.drawGrid();
-  }
-
-  handleChange(e) {
-    const testIndex = e.target.value;
-    this.setState(() => ({ testIndex }));
+    this.play();
   }
 
   randomBoard() {
@@ -36,8 +39,7 @@ class Board extends Component {
       }
       return 0;
     });
-    const testIndex = Math.floor(Math.random() * this.state.height * this.state.width);
-    this.setState(() => ({ cells, testIndex }), () => {
+    this.setState(() => ({ cells }), () => {
       this.drawCells();
     });
   }
@@ -61,7 +63,7 @@ class Board extends Component {
     }
   }
 
-  drawCell(x, y, bool, test) {
+  drawCell(x, y, bool) {
     const canvas = document.getElementById('board');
     const ctx = canvas.getContext('2d');
     const size = this.state.cellSize;
@@ -70,14 +72,10 @@ class Board extends Component {
       ctx.lineJoin = 'round';
       ctx.lineWidth = radius;
       ctx.strokeRect(x + (radius / 2), y + (radius / 2), size - radius, size - radius);
-      if (test) {
-        ctx.fillStyle = 'red';
-      } else { ctx.fillStyle = 'black'; }
+      ctx.fillStyle = `hsl(${(x + y) % 255}, 50%, 50%)`;
       ctx.fillRect(x + (radius / 2), y + (radius / 2), size - radius, size - radius);
     } else {
-      if (test) {
-        ctx.fillStyle = 'pink';
-      } else { ctx.fillStyle = 'white'; }
+      ctx.fillStyle = 'black';
       ctx.fillRect(x, y, size, size);
     }
   }
@@ -128,7 +126,7 @@ cells[this.crAdjToI(c - 1, r + 1)],
     return neighbors.reduce((a, b) => a + b);
   }
 
-  newBoard() {
+  step() {
     let nextCells = [];
     const currentBoard = this.state.cells;
     nextCells = currentBoard.map((cell, i) => {
@@ -143,22 +141,77 @@ cells[this.crAdjToI(c - 1, r + 1)],
     });
   }
 
+  play() {
+    this.setState({
+      running: true,
+    }, () => { this.run(); });
+  }
+
+  run() {
+    const self = this;
+    function nextStep() {
+      if (!self.state.running) { window.clearInterval(window.interval); return; }
+      const generation = self.state.generation + 1;
+      self.setState({
+        generation,
+      }, () => {
+        self.step();
+      });
+    }
+    if (this.state.running) {
+      window.interval = window.setInterval(nextStep, 10);
+    }
+  }
+
+  pause() {
+    window.clearInterval(window.interval);
+    this.setState({
+      running: false,
+    });
+  }
+
+  reset() {
+    window.clearInterval(window.interval);
+    this.setState({
+      running: false,
+    }, () => { this.randomBoard(); });
+  }
+
+  toggleGrid() {
+    const grid = !this.state.grid;
+    this.setState({ grid });
+  }
+
+  toggleSpeed() {
+    const speed = this.state.speed;
+    let newSpeed = speed;
+    if (speed === 10) {
+      newSpeed = 100;
+    } else if (speed === 100) {
+      newSpeed = 200;
+    } else {
+      newSpeed = 10;
+    }
+    this.setState({
+      speed: newSpeed,
+    }, () => { this.play(); });
+  }
+
+  // toggleTrails() {}
+
 
   render() {
-    const arr = this.idxToCR(this.state.testIndex);
     return (
       <div>
-        <input type="number" name="testIndex" value={this.state.testIndex} onChange={e => this.handleChange(e)} />
-        <br />
-        <button onClick={() => this.newBoard()}>New Board</button>
-        <div>Live Neighbors of cell at index {this.state.testIndex}:
-<br /> {this.liveNbCount(this.state.testIndex)}</div>
-        <div>crAdjToI of cell at index {this.state.testIndex}:
-<br /> {this.crAdjToI(arr[0], arr[1])}</div>
-        <div>idxToCR of cell at index {this.state.testIndex}:
-<br /> c: {arr[0]}, r: {arr[1]}</div>
+        <button onClick={() => this.step()}>Step</button>
+        <button onClick={() => this.play()}>Play</button>
+        <button onClick={() => this.pause()}>Pause</button>
+        <button onClick={() => this.reset()}>Reset</button>
+        <button onClick={() => this.toggleGrid()}>{this.state.grid ? 'Hide Grid' : 'Show Grid'}</button>
+        <button onClick={() => this.toggleTrails()}>{this.state.trails ? 'Hide Trails' : 'Show Trails'}</button>
+        <div>Generation: {this.state.generation}</div>
         <canvas id="board" width={this.state.width * this.state.cellSize} height={this.state.height * this.state.cellSize} />
-        <canvas id="grid" width={this.state.width * this.state.cellSize} height={this.state.height * this.state.cellSize} />
+        <canvas id="grid" className={this.state.grid ? 'visible' : 'hidden'} width={this.state.width * this.state.cellSize} height={this.state.height * this.state.cellSize} />
       </div>
     );
   }
