@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
+import patterns from './patterns';
 
 class Board extends Component {
   constructor() {
     super();
     this.state = {
-      width: Math.floor(window.innerWidth * 0.05),
-      height: Math.floor(window.innerHeight * 0.05),
+      width: 75,
+      height: 50,
       cellSize: 14,
       cells: [],
       nextCells: [],
@@ -14,7 +15,6 @@ class Board extends Component {
       paused: false,
       changed: [],
       static: [],
-      grid: false,
       trails: true,
     };
 
@@ -22,12 +22,10 @@ class Board extends Component {
     this.play = this.play.bind(this);
     this.pause = this.pause.bind(this);
     this.reset = this.reset.bind(this);
-    this.toggleGrid = this.toggleGrid.bind(this);
   }
 
   componentDidMount() {
     this.randomBoard();
-    this.drawGrid();
     this.play();
   }
 
@@ -43,31 +41,12 @@ class Board extends Component {
     });
   }
 
-  drawGrid() {
-    const canvas = document.getElementById('grid');
-    const ctx = canvas.getContext('2d');
-    for (let i = 0; i <= this.state.width; i++) {
-      ctx.beginPath();
-      ctx.moveTo(i * this.state.cellSize, 0);
-      ctx.lineTo(i * this.state.cellSize, this.state.height * this.state.cellSize);
-      ctx.strokeStyle = '#4c4c4c';
-      ctx.stroke();
-    }
-    for (let i = 0; i <= this.state.width; i++) {
-      ctx.beginPath();
-      ctx.moveTo(0, i * this.state.cellSize);
-      ctx.lineTo(this.state.width * this.state.cellSize, i * this.state.cellSize);
-      ctx.strokeStyle = '#4c4c4c';
-      ctx.stroke();
-    }
-  }
-
   drawCell(x, y, bool) {
-    const { generation, cellSize } = this.state;
+    const { cellSize } = this.state;
     const canvas = document.getElementById('board');
     const ctx = canvas.getContext('2d');
     const radius = 0.4 * cellSize;
-    const hue = ((x + y + generation) / cellSize) % 255;
+    const hue = ((x + y) / 4) % 360;
     if (bool) {
       ctx.lineJoin = 'round';
       ctx.lineWidth = radius;
@@ -188,12 +167,17 @@ cells[this.crAdjToI(c - 1, r + 1)],
     window.clearInterval(window.interval);
     this.setState({
       running: false, generation: 0,
-    }, () => { this.randomBoard(); });
+    }, () => {
+      this.randomBoard();
+      this.play();
+    });
   }
 
-  toggleGrid() {
-    const grid = !this.state.grid;
-    this.setState({ grid });
+  loadPattern(pattern) {
+    const cells = patterns[pattern];
+    this.setState(() => ({ cells, generation: 0 }), () => {
+      this.drawCells(cells);
+    });
   }
 
   handleClick(e) {
@@ -216,13 +200,19 @@ cells[this.crAdjToI(c - 1, r + 1)],
   render() {
     return (
       <div>
-        <button onClick={() => this.step()}>Step</button>
-        <button onClick={() => this.play()}>Play</button>
-        <button onClick={() => this.pause()}>Pause</button>
-        <button onClick={() => this.reset()}>Reset</button>
-        <button onClick={() => this.toggleGrid()}>{this.state.grid ? 'Hide Grid' : 'Show Grid'}</button>
-        <button onClick={() => this.toggleTrails()}>{this.state.trails ? 'Hide Trails' : 'Show Trails'}</button>
-        <div>Generation: {this.state.generation}</div>
+        <h2>Conway&rsquo;s Game of Life</h2>
+        <h3><a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life" target="_blank" rel="noopener noreferrer">About the game</a></h3>
+        <p className="center">Click cells next to static patterns to re-activate them</p>
+        <div className="controls">
+          <div className="generation">Generation:
+          <div className="counter">{this.state.generation}</div>
+          </div>
+          <button className="btn waves-effect play" onClick={() => this.play()} />
+          <button className="btn waves-effect pause" onClick={() => this.pause()} />
+          <button className="btn waves-effect random" onClick={() => this.reset()} />
+          <button className="btn waves-effect pattern" onClick={() => this.loadPattern('gliderGun')}>glider gun</button>
+          <button className="btn waves-effect pattern" onClick={() => this.loadPattern('acorn')}>acorn</button>
+        </div>
         <canvas
           id="board"
           className="board"
@@ -230,7 +220,6 @@ cells[this.crAdjToI(c - 1, r + 1)],
           width={this.state.width * this.state.cellSize}
           height={this.state.height * this.state.cellSize}
         />
-        <canvas id="grid" className={this.state.grid ? 'visible' : 'hidden'} width={this.state.width * this.state.cellSize} height={this.state.height * this.state.cellSize} />
       </div>
     );
   }
