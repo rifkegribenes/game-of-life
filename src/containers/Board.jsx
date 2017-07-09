@@ -201,7 +201,8 @@ cells[this.crAdjToI(c - 1, r + 1)],
     return (
       <div>
         <h2>Conway&rsquo;s Game of Life</h2>
-        <h3><a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life" target="_blank" rel="noopener noreferrer">About the game</a></h3>
+        <h3><a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life" target="_blank" rel="noopener noreferrer">About the game</a>
+        &nbsp;•&nbsp;<a href="https://github.com/rifkegribenes/game-of-life" target="_blank" rel="noopener noreferrer">See code on GitHub</a></h3>
         <p className="center">Click cells next to static patterns to re-activate them</p>
         <div className="controls">
           <div className="generation">Generation:
