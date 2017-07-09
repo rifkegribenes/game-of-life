@@ -4,9 +4,9 @@ class Board extends Component {
   constructor() {
     super();
     this.state = {
-      width: 72,
-      height: 54,
-      cellSize: 10,
+      width: Math.floor(window.innerWidth * 0.05),
+      height: Math.floor(window.innerHeight * 0.05),
+      cellSize: 14,
       cells: [],
       nextCells: [],
       generation: 0,
@@ -23,7 +23,6 @@ class Board extends Component {
     this.pause = this.pause.bind(this);
     this.reset = this.reset.bind(this);
     this.toggleGrid = this.toggleGrid.bind(this);
-    // this.toggleTrails = this.toggleTrails.bind(this);
   }
 
   componentDidMount() {
@@ -34,13 +33,13 @@ class Board extends Component {
 
   randomBoard() {
     const cells = new Array(this.state.height * this.state.width).fill(0).map(() => {
-      if (Math.random() >= 0.7) {
+      if (Math.random() >= 0.8) {
         return 1;
       }
       return 0;
     });
     this.setState(() => ({ cells }), () => {
-      this.drawCells();
+      this.drawCells(cells);
     });
   }
 
@@ -51,43 +50,52 @@ class Board extends Component {
       ctx.beginPath();
       ctx.moveTo(i * this.state.cellSize, 0);
       ctx.lineTo(i * this.state.cellSize, this.state.height * this.state.cellSize);
-      ctx.strokeStyle = '#cecece';
+      ctx.strokeStyle = '#4c4c4c';
       ctx.stroke();
     }
     for (let i = 0; i <= this.state.width; i++) {
       ctx.beginPath();
       ctx.moveTo(0, i * this.state.cellSize);
       ctx.lineTo(this.state.width * this.state.cellSize, i * this.state.cellSize);
-      ctx.strokeStyle = '#cecece';
+      ctx.strokeStyle = '#4c4c4c';
       ctx.stroke();
     }
   }
 
   drawCell(x, y, bool) {
+    const { generation, cellSize } = this.state;
     const canvas = document.getElementById('board');
     const ctx = canvas.getContext('2d');
-    const size = this.state.cellSize;
-    const radius = 0.4 * size;
+    const radius = 0.4 * cellSize;
+    const hue = ((x + y + generation) / cellSize) % 255;
     if (bool) {
       ctx.lineJoin = 'round';
       ctx.lineWidth = radius;
-      ctx.strokeRect(x + (radius / 2), y + (radius / 2), size - radius, size - radius);
-      ctx.fillStyle = `hsl(${(x + y) % 255}, 50%, 50%)`;
-      ctx.fillRect(x + (radius / 2), y + (radius / 2), size - radius, size - radius);
+      ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+      ctx.strokeRect(x + (radius / 2), y + (radius / 2), cellSize - radius, cellSize - radius);
+      ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+      ctx.fillRect(x + (radius / 2), y + (radius / 2), cellSize - radius, cellSize - radius);
     } else {
       ctx.fillStyle = 'black';
-      ctx.fillRect(x, y, size, size);
+      ctx.fillRect(x, y, cellSize, cellSize);
     }
   }
 
-  drawCells() {
-    this.state.cells.forEach((cell, idx) => {
-      const x = this.state.cellSize * (idx % this.state.width);
-      const y = this.state.cellSize * (Math.floor(idx / this.state.width));
-      const bool = this.state.cells[idx];
-      const test = idx === this.state.testIndex;
-      this.drawCell(x, y, bool, test);
+  drawCells(arr) {
+    arr.forEach((cell, idx) => {
+      if (cell !== undefined) {
+        const x = this.state.cellSize * (idx % this.state.width);
+        const y = this.state.cellSize * (Math.floor(idx / this.state.width));
+        const bool = this.state.cells[idx];
+        this.drawCell(x, y, bool);
+      }
     });
+  }
+
+  xyToIdx(x, y) {
+    const c = Math.floor(x / this.state.cellSize);
+    const r = Math.floor(y / this.state.cellSize);
+    return c + (r * this.state.width);
   }
 
   idxToCR(i) {
@@ -136,8 +144,14 @@ cells[this.crAdjToI(c - 1, r + 1)],
       }
       return 0;
     });
+    const changed = nextCells.map((cell, i) => {
+      if (cell !== currentBoard[i]) {
+        return cell;
+      }
+      return undefined;
+    });
     this.setState(() => ({ cells: nextCells }), () => {
-      this.drawCells();
+      this.drawCells(changed);
     });
   }
 
@@ -173,7 +187,7 @@ cells[this.crAdjToI(c - 1, r + 1)],
   reset() {
     window.clearInterval(window.interval);
     this.setState({
-      running: false,
+      running: false, generation: 0,
     }, () => { this.randomBoard(); });
   }
 
@@ -182,22 +196,21 @@ cells[this.crAdjToI(c - 1, r + 1)],
     this.setState({ grid });
   }
 
-  toggleSpeed() {
-    const speed = this.state.speed;
-    let newSpeed = speed;
-    if (speed === 10) {
-      newSpeed = 100;
-    } else if (speed === 100) {
-      newSpeed = 200;
-    } else {
-      newSpeed = 10;
-    }
-    this.setState({
-      speed: newSpeed,
-    }, () => { this.play(); });
+  handleClick(e) {
+    const target = e.target || e.srcElement;
+    const rect = target.getBoundingClientRect();
+    const offsetX = Math.floor(e.clientX - rect.left);
+    const offsetY = Math.floor(e.clientY - rect.top);
+    const x = offsetX - (offsetX % this.state.cellSize);
+    const y = offsetY - (offsetY % this.state.cellSize);
+    this.drawCell(x, y, true);
+    const idx = this.xyToIdx(x, y);
+    const cells = this.state.cells;
+    cells.splice(idx, 1, 1);
+    this.setState({ cells }, () => {
+      this.step();
+    });
   }
-
-  // toggleTrails() {}
 
 
   render() {
@@ -210,7 +223,13 @@ cells[this.crAdjToI(c - 1, r + 1)],
         <button onClick={() => this.toggleGrid()}>{this.state.grid ? 'Hide Grid' : 'Show Grid'}</button>
         <button onClick={() => this.toggleTrails()}>{this.state.trails ? 'Hide Trails' : 'Show Trails'}</button>
         <div>Generation: {this.state.generation}</div>
-        <canvas id="board" width={this.state.width * this.state.cellSize} height={this.state.height * this.state.cellSize} />
+        <canvas
+          id="board"
+          className="board"
+          onClick={e => this.handleClick(e)}
+          width={this.state.width * this.state.cellSize}
+          height={this.state.height * this.state.cellSize}
+        />
         <canvas id="grid" className={this.state.grid ? 'visible' : 'hidden'} width={this.state.width * this.state.cellSize} height={this.state.height * this.state.cellSize} />
       </div>
     );

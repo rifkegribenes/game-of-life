@@ -12,3 +12,7 @@ canvas {
 .hidden {
 	display: none;
 }
+
+.board {
+	z-index: 2;
+}
