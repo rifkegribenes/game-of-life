@@ -12,7 +12,7 @@ canvas {
 	position:absolute;
   left:50%;
   top:50%;
-  transform:translate(-50%, -40%);
+  transform:translate(-50%, -37%);
   border: 1px solid rgba(255,255,255,.25);
   -webkit-box-shadow: 0px 0px 50px 0px rgba(255,255,255,.25);
 -moz-box-shadow: 0px 0px 50px 0px rgba(255,255,255,.25);
@@ -67,7 +67,7 @@ h3 a {
 
 .controls {
 	width: 100%;
-	padding: 20px;
+	padding: 15px;
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
@@ -75,7 +75,7 @@ h3 a {
 
 .generation {
 	text-transform: uppercase;
-	font-size: 16px;
+	font-size: 12px;
 	letter-spacing: 2px;
 	display: inline-block;
 	text-align: left;
@@ -85,20 +85,20 @@ h3 a {
 .counter {
 	font-family: 'Roboto Mono', monospace;
   font-weight: 100;
-	font-size: 24px;
+	font-size: 20px;
 	padding-top: 10px;
-	min-width: 60px;
+	min-width: 100px;
 	color: #42f44e;
 	border: 1px solid white;
 	margin: 6px auto;
-	padding: 4px 12px 8px 12px;
+	padding: 2px 12px 4px 12px;
 	text-align: center;
 }
 
 
 
 .btn {
-    margin: 27px 0 0 15px;
+    margin: 21px 0 0 15px;
     border: 1px solid #fff;
     text-align: center;
     padding: .2rem;
@@ -112,7 +112,7 @@ h3 a {
     text-align: center;
     transition: .2s ease-out;
     cursor: pointer;
-    height: 46px;
+    height: 34px;
 
     &:hover {
     	background-color: #FFA726;
@@ -160,9 +160,10 @@ h3 a {
 .pattern {
 	font-family: 'Exo 2', sans-serif;
 	font-weight: 100 !important;
-	font-size: 1em;
+	font-size: 14px;
 }
 
 .center {
 	text-align: center;
+	margin-bottom: 0;
 }
