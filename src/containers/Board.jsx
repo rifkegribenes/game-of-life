@@ -7,7 +7,7 @@ class Board extends Component {
     this.state = {
       width: 75,
       height: 50,
-      cellSize: 12,
+      cellSize: Math.floor((window.innerHeight-208)/50) || 2,
       cells: [],
       nextCells: [],
       generation: 0,
@@ -25,21 +25,13 @@ class Board extends Component {
   }
 
   componentDidMount() {
-  	let cellSize;
-  	if (window.innerWidth <1000 || window.innerHeight <1000) {
-  		cellSize = Math.floor(window.innerHeight/80);
-  	} else {
-  		cellSize = 12;
-  	}
-  	this.setState(()=>({cellSize,}), () => {
-  		this.randomBoard();
+  	this.randomBoard();
     this.play();
-  	})
   }
 
   randomBoard() {
     const cells = new Array(this.state.height * this.state.width).fill(0).map(() => {
-      if (Math.random() >= 0.8) {
+      if (Math.random() >= 0.5) {
         return 1;
       }
       return 0;
@@ -53,7 +45,7 @@ class Board extends Component {
     const { cellSize } = this.state;
     const canvas = document.getElementById('board');
     const ctx = canvas.getContext('2d');
-    const radius = 4;
+    const radius = Math.floor((cellSize)*.4) || 2;
     const hue = ((x + y) / 4) % 360;
     if (bool) {
       ctx.lineJoin = 'round';
@@ -213,9 +205,8 @@ cells[this.crAdjToI(c - 1, r + 1)],
         &nbsp;•&nbsp;<a href="https://github.com/rifkegribenes/game-of-life" target="_blank" rel="noopener noreferrer">See code on GitHub</a></h3>
         <p className="center">Click cells next to static patterns to re-activate them</p>
         <div className="controls">
-          <div className="generation">Generation:
+          <div className="generation">Generation:</div>
           <div className="counter">{this.state.generation}</div>
-          </div>
           <button className="btn waves-effect play" onClick={() => this.play()} />
           <button className="btn waves-effect pause" onClick={() => this.pause()} />
           <button className="btn waves-effect random" onClick={() => this.reset()} />
