@@ -9,14 +9,17 @@ $lightgreen: lighten($green,15%);
 }
 
 canvas {
-	position:absolute;
-  left:50%;
-  top:50%;
-  transform:translate(-50%, -37%);
   border: 1px solid rgba(255,255,255,.25);
   -webkit-box-shadow: 0px 0px 50px 0px rgba(255,255,255,.25);
 -moz-box-shadow: 0px 0px 50px 0px rgba(255,255,255,.25);
 box-shadow: 0px 0px 50px 0px rgba(255,255,255,.25);
+margin: auto;
+}
+
+.container {
+	width: 100%;
+	display: flex;
+	justify-content: center;
 }
 
 .visible {

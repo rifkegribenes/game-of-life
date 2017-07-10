@@ -7,7 +7,7 @@ class Board extends Component {
     this.state = {
       width: 75,
       height: 50,
-      cellSize: 14,
+      cellSize: 12,
       cells: [],
       nextCells: [],
       generation: 0,
@@ -25,8 +25,16 @@ class Board extends Component {
   }
 
   componentDidMount() {
-    this.randomBoard();
+  	let cellSize;
+  	if (window.innerWidth <1000 || window.innerHeight <1000) {
+  		cellSize = Math.floor(window.innerHeight/80);
+  	} else {
+  		cellSize = 12;
+  	}
+  	this.setState(()=>({cellSize,}), () => {
+  		this.randomBoard();
     this.play();
+  	})
   }
 
   randomBoard() {
@@ -45,7 +53,7 @@ class Board extends Component {
     const { cellSize } = this.state;
     const canvas = document.getElementById('board');
     const ctx = canvas.getContext('2d');
-    const radius = 0.4 * cellSize;
+    const radius = 4;
     const hue = ((x + y) / 4) % 360;
     if (bool) {
       ctx.lineJoin = 'round';
@@ -152,7 +160,7 @@ cells[this.crAdjToI(c - 1, r + 1)],
       });
     }
     if (this.state.running) {
-      window.interval = window.setInterval(nextStep, 10);
+      window.interval = window.setInterval(nextStep, 20);
     }
   }
 
@@ -214,6 +222,7 @@ cells[this.crAdjToI(c - 1, r + 1)],
           <button className="btn waves-effect pattern" onClick={() => this.loadPattern('gliderGun')}>glider gun</button>
           <button className="btn waves-effect pattern" onClick={() => this.loadPattern('acorn')}>acorn</button>
         </div>
+        <div className="container">
         <canvas
           id="board"
           className="board"
@@ -221,6 +230,7 @@ cells[this.crAdjToI(c - 1, r + 1)],
           width={this.state.width * this.state.cellSize}
           height={this.state.height * this.state.cellSize}
         />
+        </div>
       </div>
     );
   }
